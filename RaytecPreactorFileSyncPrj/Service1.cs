@@ -91,6 +91,7 @@ namespace RaytecPreactorFileSyncPrj
         string sourceFileNameChanged;
         string sourceFileNameDllChanged;
         object lockFileRes = new object();
+        List<FileSystemWatcher> watchers = new List<FileSystemWatcher>();
 
         public PreactorFileObserver()
         {
@@ -104,23 +105,41 @@ namespace RaytecPreactorFileSyncPrj
             bool isParseSuccess = int.TryParse(ConfigurationManager.AppSettings.Get("TimeInterval_ms"), out timeInterval_ms);
             if (!isParseSuccess) timeInterval_ms = 1000;
 
-            //string path = "c:\\1.txt";
+            string[] filtersDll = filterDll.Split('|');
+            string[] filters = filter.Split('|');
+
+            CreateFWObjFromExtString(filters, FileChanged, sourcePath);
+
+            CreateFWObjFromExtString(filtersDll, FileChangedDll, sourcePathDll);
+
+            /*
             watcher = new FileSystemWatcher();
-            //string dirName = Path.GetDirectoryName(path);
-            //string fileName = Path.GetFileName(path);
             watcher.Path = sourcePath;
             watcher.Filter = filter;
             watcher.Changed += FileChanged;
-
-
-            //string pathDll = "d:\\2.txt";
             watcherDll = new FileSystemWatcher();
-            //string dirNameDll = Path.GetDirectoryName(pathDll);
-            //string fileNameDll = Path.GetFileName(pathDll);
             watcherDll.Path = sourcePathDll;
             watcherDll.Filter = filterDll;
             watcherDll.Changed += FileChangedDll;
+            */
         }//PreactorFileObserver()
+
+        private void CreateFWObjFromExtString(string[] filters, FileSystemEventHandler handler,string sourcePath)
+        {
+            //string[] filters = { "*.txt", "*.doc", "*.docx", "*.xls", "*.xlsx" };
+            foreach (string f in filters)
+            {
+                FileSystemWatcher w = new FileSystemWatcher();
+                w.Path = sourcePath;
+                w.Filter = f;
+                w.Changed += handler;
+                watchers.Add(w);
+            }
+
+
+        }//CreateFWObjFromExtString
+
+
         private string GetMD5HAsh(string path)
         {
             using (var md5 = MD5.Create())
@@ -235,8 +254,12 @@ namespace RaytecPreactorFileSyncPrj
             string fullPathDll;
             string fileNameDll;
 
-            watcher.EnableRaisingEvents = true;
-            watcherDll.EnableRaisingEvents = true;
+            foreach (var w in watchers)
+            {
+                w.EnableRaisingEvents = true;
+            }
+
+
             while (enabled)
             {
                 lock (lockFileRes)
