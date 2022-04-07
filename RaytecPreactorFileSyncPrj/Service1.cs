@@ -91,7 +91,6 @@ namespace RaytecPreactorFileSyncPrj
         string sourceFileNameChanged;
         string sourceFileNameDllChanged;
         object lockFileRes = new object();
-        object lockFileDllRes = new object();
 
         public PreactorFileObserver()
         {
@@ -221,7 +220,7 @@ namespace RaytecPreactorFileSyncPrj
             string fullPath = e.FullPath;
             string fileName = e.Name;
             CopyFilesDll(fullPath, fileName);
-            lock (lockFileDllRes)
+            lock (lockFileRes)
             {
                 sourceFullPathDllChanged = fullPath;
                 sourceFileNameDllChanged = fileName;
@@ -240,11 +239,13 @@ namespace RaytecPreactorFileSyncPrj
             watcherDll.EnableRaisingEvents = true;
             while (enabled)
             {
-                fullPath = sourceFullPathChanged;
-                fileName = sourceFileNameChanged;
-                fullPathDll = sourceFullPathDllChanged;
-                fileNameDll = sourceFileNameDllChanged;
-
+                lock (lockFileRes)
+                {
+                    fullPath = sourceFullPathChanged;
+                    fileName = sourceFileNameChanged;
+                    fullPathDll = sourceFullPathDllChanged;
+                    fileNameDll = sourceFileNameDllChanged;
+                }
                 bool retry = notCopied == true ? !CompareFile(fullPath, fileName): notCopied;
 
                 if (retry == true)
