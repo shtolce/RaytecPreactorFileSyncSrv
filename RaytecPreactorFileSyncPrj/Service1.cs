@@ -17,6 +17,9 @@ using System.Windows.Forms;
 
 namespace RaytecPreactorFileSyncPrj
 {
+    /// <summary>
+    /// Основной класс сервиса
+    /// </summary>
     public partial class Service1 : ServiceBase
     {
         //[Conditional("DEBUG_SERVICE")]
@@ -123,7 +126,12 @@ namespace RaytecPreactorFileSyncPrj
             watcherDll.Changed += FileChangedDll;
             */
         }//PreactorFileObserver()
-
+        /// <summary>
+        /// Создает экземпляры ватчера по всем расширениям в фильтре
+        /// </summary>
+        /// <param name="filters"></param>
+        /// <param name="handler"></param>
+        /// <param name="sourcePath"></param>
         private void CreateFWObjFromExtString(string[] filters, FileSystemEventHandler handler,string sourcePath)
         {
             //string[] filters = { "*.txt", "*.doc", "*.docx", "*.xls", "*.xlsx" };
@@ -139,7 +147,7 @@ namespace RaytecPreactorFileSyncPrj
 
         }//CreateFWObjFromExtString
 
-
+        //хеш, для сравнения файлов по содержимому
         private string GetMD5HAsh(string path)
         {
             using (var md5 = MD5.Create())
@@ -152,6 +160,11 @@ namespace RaytecPreactorFileSyncPrj
             }
         }//GetMD5HAsh
 
+        /// <summary>
+        /// Копирует файлы из папки 1
+        /// </summary>
+        /// <param name="fullPath"></param>
+        /// <param name="fileName"></param>
         private void CopyFiles(string fullPath,string fileName)
         {
             FileInfo fInfo = new FileInfo(fullPath);
@@ -168,6 +181,11 @@ namespace RaytecPreactorFileSyncPrj
             }
         }//CopyFiles()
 
+        /// <summary>
+        /// Копирует файлы из папки 2
+        /// </summary>
+        /// <param name="fullPath"></param>
+        /// <param name="fileName"></param>
         private void CopyFilesDll(string fullPath, string fileName)
         {
             FileInfo fInfo = new FileInfo(fullPath);
@@ -184,6 +202,12 @@ namespace RaytecPreactorFileSyncPrj
             }
         }//CopyFiles()
 
+        /// <summary>
+        /// сравнивает содержимое файлов из источника и целевой папки
+        /// </summary>
+        /// <param name="fullPath"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         private bool CompareFile(string fullPath, string fileName)
         {
             DirectoryInfo dirInfo = new DirectoryInfo(destinationPath);
@@ -259,7 +283,6 @@ namespace RaytecPreactorFileSyncPrj
                 w.EnableRaisingEvents = true;
             }
 
-
             while (enabled)
             {
                 lock (lockFileRes)
@@ -293,15 +316,5 @@ namespace RaytecPreactorFileSyncPrj
         }
 
     }//class PreactorFileObserver
-
-
-
-
-
-
-
-
-
-
 
 }//ns
