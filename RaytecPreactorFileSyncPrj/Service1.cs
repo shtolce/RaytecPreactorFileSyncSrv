@@ -17,6 +17,7 @@ using System.Windows.Forms;
 
 namespace RaytecPreactorFileSyncPrj
 {
+    //C:\Windows\Microsoft.NET\Framework64\v4.0.30319\InstallUtil.exe "C:\Users\Shtolce\source\repos\RaytecPreactorFileSyncSrv\RaytecPreactorFileSyncPrj\bin\Debug\RaytecPreactorFileSyncPrj.exe"
     /// <summary>
     /// Основной класс сервиса
     /// </summary>
@@ -311,7 +312,10 @@ namespace RaytecPreactorFileSyncPrj
 
         public void Stop()
         {
-            watcher.EnableRaisingEvents = false;
+            foreach (var w in watchers)
+            {
+                w.EnableRaisingEvents = false;
+            }
             enabled = false;
         }
 
